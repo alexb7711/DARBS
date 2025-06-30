@@ -137,8 +137,8 @@ preinstallmsg() {
 #
 adduserandpass() {
 	case "${os}" in
-		*Debian*)group="sudo";;
-		*Arch*)group="wheel";;
+		*Debian*) group="sudo";;
+		*Arch*) group="wheel";;
 		*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
 	esac
 
