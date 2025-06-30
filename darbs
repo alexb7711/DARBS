@@ -41,7 +41,7 @@ installpkg() {
 	esac
 
 	# Install the package
-	${pkg_mngr} "$1" >/dev/null 2>&1
+	${pkg_mngr} "$1" > /dev/null 2>&1
 }
 
 ##============================================================================
@@ -244,8 +244,13 @@ installationloop() {
 	esac
 
 	progsfile="./prog-lists/${csv_file}"
-	total=$(wc -l </tmp/progs.csv)
-	aurinstalled=$(pacman -Qqm)
+	total=$(wc -l <$progsfile)
+
+	case "${os}" in
+		*Arch*) aurinstalled=$(pacman -Qqm);;
+		*);;
+	esac
+
 	while IFS=, read -r tag program comment; do
 		n=$((n + 1))
 		echo "$comment" | grep -q "^\".*\"$" &&
@@ -256,7 +261,7 @@ installationloop() {
 		"P") pipinstall "$program" "$comment" ;;
 		*) maininstall "$program" "$comment" ;;
 		esac
-	done </tmp/progs.csv
+	done <$progsfile
 }
 
 ##============================================================================
@@ -380,7 +385,11 @@ installationloop
 # Install the dotfiles in the user's home directory, but remove .git dir and
 # other unnecessary files.
 putgitrepo "$dotfilesrepo" "/home/$name/code/dotfiles" "$repobranch"
-/home/$name/code/dotfiles/./run
+
+oldpath=$(pwd)
+cd /home/$name/code/dotfiles/
+sudo -u $name ./run
+cd ${oldpath}
 
 # Most important command! Get rid of the beep!
 rmmod pcspkr
@@ -401,8 +410,8 @@ case "${os}" in
 		curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
 		curl -fsSLo /etc/apt/sources.list.d/brave-browser-release.sources https://brave-browser-apt-release.s3.brave.com/brave-browser.sources
 
-		apt update -y
-		apt install -y brave-browser
+		apt update -y > /dev/null 2>&1
+		apt install -y brave-browser > /dev/null 2>&1
 		;;
 	*Arch*) $aurhelper -S --noconfirm brave-browser ;;
 	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
@@ -412,8 +421,8 @@ esac
 whiptail --infobox "Installing ncspot..." 7 60
 case "${os}" in
 	*Debian*)
-		apt install -y snapd
-		snap install ncspot --no-confirm
+		apt install -y snapd > /dev/null 2>&1
+		snap install ncspot --no-confirm > /dev/null 2>&1
 		;;
 	*Arch*) $aurhelper -S --noconfirm brave-browser ;;
 	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
@@ -422,8 +431,8 @@ esac
 # Allow ${group} users to sudo with password and allow several system commands
 # (like `shutdown` to run without password).
 echo "%${group} ALL=(ALL:ALL) ALL" >/etc/sudoers.d/00-darbs-${group}-can-sudo
-echo "%${group} ALL=(ALL:ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/pacman -Syyuw --noconfirm,/usr/bin/pacman -S -y --config /etc/pacman.conf --,/usr/bin/pacman -S -y -u --config /etc/pacman.conf --" >/etc/sudoers.d/01-darbs-cmds-without-password
-echo "Defaults editor=/usr/bin/nvim" >/etc/sudoers.d/02-darbs-visudo-editor
+echo "%${group} ALL=(ALL:ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/pacman -Syyuw --noconfirm,/usr/bin/pacman -S -y --config /etc/pacman.conf --,/usr/bin/pacman -S -y -u --config /etc/pacman.conf --,/usr/bin/apt update, /usr/bin/apt install, /usr/bin/apt upgrade" >/etc/sudoers.d/01-darbs-cmds-without-password
+echo "Defaults editor=/usr/bin/vim" >/etc/sudoers.d/02-darbs-visudo-editor
 mkdir -p /etc/sysctl.d
 echo "kernel.dmesg_restrict = 0" > /etc/sysctl.d/dmesg.conf
 
