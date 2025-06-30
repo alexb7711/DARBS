@@ -86,14 +86,6 @@ getuserandpass() {
 		clear && create_account="n"
 	}
 
-	case $create_account in
-		n) 
-			name=$(whiptail --inputbox "Enter the name of the user you wish to run DARBS for." 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
-			return
-			;;
-		*);; # Continue
-	esac
-
 	# Prompts user for new username and password.
 	name=$(whiptail --inputbox "First, please enter a name for the user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
 	while ! echo "$name" | grep -q "^[a-z_][a-z0-9_-]*$"; do
@@ -119,7 +111,7 @@ usercheck() {
 	! { id -u "$name" >/dev/null 2>&1; } ||
 		whiptail --title "WARNING" --yes-button "CONTINUE" \
 			--no-button "No wait..." \
-			--yesno "The user \`$name\` already exists on this system. LARBS can install for a user already existing, but it will OVERWRITE any conflicting settings/dotfiles on the user account.\\n\\nLARBS will NOT overwrite your user files, documents, videos, etc., so don't worry about that, but only click <CONTINUE> if you don't mind your settings being overwritten.\\n\\nNote also that LARBS will change $name's password to the one you just gave." 14 70
+			--yesno "The user \`$name\` already exists on this system. DARBS can install for a user already existing, but it will OVERWRITE any conflicting settings/dotfiles on the user account.\\n\\nDARBS will NOT overwrite your user files, documents, videos, etc., so don't worry about that, but only click <CONTINUE> if you don't mind your settings being overwritten.\\n\\nNote also that DARBS will change $name's password to the one you just gave." 14 70
 }
 
 ##============================================================================
@@ -206,7 +198,7 @@ manualinstall() {
 #
 maininstall() {
 	# Installs all needed programs from main repo.
-	whiptail --title "LARBS Installation" --infobox "Installing \`$1\` ($n of $total). $1 $2" 9 70
+	whiptail --title "DARBS Installation" --infobox "Installing \`$1\` ($n of $total). $1 $2" 9 70
 	installpkg "$1"
 }
 
@@ -216,7 +208,7 @@ gitmakeinstall() {
 	progname="${1##*/}"
 	progname="${progname%.git}"
 	dir="$repodir/$progname"
-	whiptail --title "LARBS Installation" \
+	whiptail --title "DARBS Installation" \
 		--infobox "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2" 8 70
 	sudo -u "$name" git -C "$repodir" clone --depth 1 --single-branch \
 		--no-tags -q "$1" "$dir" ||
@@ -233,7 +225,7 @@ gitmakeinstall() {
 ##============================================================================
 #
 aurinstall() {
-	whiptail --title "LARBS Installation" \
+	whiptail --title "DARBS Installation" \
 		--infobox "Installing \`$1\` ($n of $total) from the AUR. $1 $2" 9 70
 	echo "$aurinstalled" | grep -q "^$1$" && return 1
 	sudo -u "$name" $aurhelper -S --noconfirm "$1" >/dev/null 2>&1
@@ -242,7 +234,7 @@ aurinstall() {
 ##============================================================================
 #
 pipinstall() {
-	whiptail --title "LARBS Installation" \
+	whiptail --title "DARBS Installation" \
 		--infobox "Installing the Python package \`$1\` ($n of $total). $1 $2" 9 70
 	[ -x "$(command -v "pip")" ] || installpkg python-pip >/dev/null 2>&1
 	yes | pip install "$1"
@@ -395,7 +387,6 @@ installationloop
 # other unnecessary files.
 putgitrepo "$dotfilesrepo" "/home/$name/code" "$repobranch"
 
-# Configure the dotfiles
 pushd "/home/$name/code"
 ./run
 popd
