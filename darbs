@@ -35,15 +35,8 @@ installpkg() {
 	pkg_mngr="" # Selected package manager based on the flavor of Linux
 	
 	case "${os}" in
-		*Debian*)
-			echo "Identified Debian..."
-			pkg_mngr="apt install -y"
-			;;
-		*Arch*)
-			echo "Identified Arch..."
-			pkg_mngr="pacman --noconfirm --needed -S"
-			;;
-
+		*Debian*) pkg_mngr="apt install -y" ;;
+		*Arch*) pkg_mngr="pacman --noconfirm --needed -S" ;;
 		*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
 	esac
 
@@ -271,6 +264,7 @@ installationloop() {
 putgitrepo() {
 	# Downloads a gitrepo $1 and places the files in $2 only overwriting conflicts
 	whiptail --infobox "Downloading and installing config files..." 7 60
+
 	[ -z "$3" ] && branch="master" || branch="$repobranch"
 	dir=$(mktemp -d)
 	[ ! -d "$2" ] && mkdir -p "$2"
@@ -385,11 +379,8 @@ installationloop
 
 # Install the dotfiles in the user's home directory, but remove .git dir and
 # other unnecessary files.
-putgitrepo "$dotfilesrepo" "/home/$name/code" "$repobranch"
-
-pushd "/home/$name/code"
-./run
-popd
+putgitrepo "$dotfilesrepo" "/home/$name/code/dotfiles" "$repobranch"
+/home/$name/code/dotfiles/./run
 
 # Most important command! Get rid of the beep!
 rmmod pcspkr

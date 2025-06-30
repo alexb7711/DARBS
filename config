@@ -3,8 +3,8 @@
 ###############################################################################
 # Required
 ###############################################################################
-dotfilesrepo="https://github.com/alexb7711/dootfiles.git"
-reporbranch="main"
+dotfilesrepo="git@github.com:alexb7711/dootfiles.git"
+repobranch="main"
 required_packages="curl ca-certificates base-devel git zsh dash stow ntp"
 
 ###############################################################################
