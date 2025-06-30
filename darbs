@@ -136,16 +136,6 @@ preinstallmsg() {
 ##============================================================================
 #
 adduserandpass() {
-	# Skip creating user if no account was created
-	case $create_account in
-		[Nn]*) return
-			export repodir="/home/$name/.local/src"
-			mkdir -p "$repodir"
-			chown -R "$name":${group} "$(dirname "$repodir")"
-			;;
-		*);; # Continue
-	esac
-
 	case "${os}" in
 		*Debian*)group="sudo";;
 		*Arch*)group="wheel";;
