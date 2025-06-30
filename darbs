@@ -419,11 +419,12 @@ case "${os}" in
 esac
 
 # All this below to get ncspot
-whiptail --infobox "Installing ncspot..." 7 60
+#whiptail --infobox "Installing ncspot..." 7 60
+clear
 case "${os}" in
 	*Debian*)
 		apt install -y snapd > /dev/null 2>&1
-		snap install ncspot --no-confirm > /dev/null 2>&1
+		snap install ncspot > /dev/null 2>&1
 		;;
 	*Arch*) $aurhelper -S --noconfirm brave-browser ;;
 	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
