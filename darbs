@@ -14,6 +14,7 @@
 ###############################################################################
 			    ### GLOBAL VARIABLES ###
 ###############################################################################
+os=""
 create_account=""
 group=""
 name=""
@@ -31,7 +32,6 @@ getos() {
 ##============================================================================
 # Install a package
 installpkg() {
-	os=$(getos) 
 	pkg_mngr="" # Selected package manager based on the flavor of Linux
 	
 	case "${os}" in
@@ -44,7 +44,7 @@ installpkg() {
 			pkg_mngr="pacman --noconfirm --needed -S"
 			;;
 
-		*) error "Unable to identify flavor of Linux: ${os}\n !!!Aborting!!!" ;;
+		*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
 	esac
 
 	# Install the package
@@ -79,10 +79,15 @@ welcomemsg() {
 #
 getuserandpass() {
 	# Ask if a user accoount is to be created
-	create_account = $(whiptail --inputbox "Do you want to create a user account? [y/N]" 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
-	
+	whiptail --title "Create user account?" --yes-button "Yes" \
+		--no-button "No" \
+		--yesno "If you don't want to create a user account, then you will be prompted for what user you want to rice." 13 60 || {
+		clear && create_account="y"
+		clear && create_account="n"
+	}
+
 	case $create_account in
-		[Nn]*) 
+		n) 
 			name=$(whiptail --inputbox "Enter the name of the user you wish to run DARBS for." 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
 			return
 			;;
@@ -107,7 +112,7 @@ getuserandpass() {
 #
 usercheck() {
 	case $create_account in
-		[Nn]*) return;;
+		n) return;;
 		*);; # Continue
 	esac
 
@@ -144,7 +149,7 @@ adduserandpass() {
 	case "${os}" in
 		*Debian*)group="sudo";;
 		*Arch*)group="wheel";;
-		*) error "Unable to identify flavor of Linux: ${os}\n !!!Aborting!!!" ;;
+		*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
 	esac
 
 	# Adds user `$name` with password $pass1.
@@ -260,7 +265,7 @@ installationloop() {
 	case "${os}" in
 		*Debian*) csv_file="prog-debian.csv";;
 		*Arch*) csv_file="prog-arch.csv";;
-		*) error "Unable to identify flavor of Linux: ${os}\n !!!Aborting!!!" ;;
+		*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
 	esac
 
 	progsfile="./prog-lists/${csv_file}"
@@ -308,6 +313,10 @@ finalize() {
 ### This is how everything happens in an intuitive format and order.
 
 # Check if user is root on a supported distro. Install whiptail.
+
+[ $(id -u) -ne 0 ] && echo "Please run the script as root... \\n!!! Aborting !!!" && exit 1
+
+os=$(getos)
 case "${os}" in
 	*Debian*)
 		apt update -y && apt install -y libnewt-dev ||
@@ -317,7 +326,7 @@ case "${os}" in
 		pacman --noconfirm --needed -Sy libnewt ||
 			error "Are you sure you're running this as the root user, running an Arch-based distribution and have an internet connection?"
 		;;
-	*) error "Unable to identify flavor of Linux: ${os}\n !!!Aborting!!!" ;;
+	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
 esac
 
 # Welcome user and pick dotfiles.
@@ -337,14 +346,14 @@ preinstallmsg || error "User exited."
 # Refresh Arch keyrings.
 case "${os}" in
 	*Debian*)
-		apt-update ||
+		apt update ||
 			error "Error automatically refreshing Debian repository. Consider doing so manually."
 		;;
 	*Arch*)
 		refreshkeys ||
 			error "Error automatically refreshing Arch keyring. Consider doing so manually."
 		;;
-	*) error "Unable to identify flavor of Linux: ${os}\n !!!Aborting!!!" ;;
+	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
 esac
 
 # Install the required packages
@@ -424,7 +433,7 @@ case "${os}" in
 		apt install -y brave-browser
 		;;
 	*Arch*) $aurhelper -S --noconfirm brave-browser ;;
-	*) error "Unable to identify flavor of Linux: ${os}\n !!!Aborting!!!" ;;
+	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
 esac
 
 # All this below to get ncspot
@@ -435,7 +444,7 @@ case "${os}" in
 		snap install ncspot
 		;;
 	*Arch*) $aurhelper -S --noconfirm brave-browser ;;
-	*) error "Unable to identify flavor of Linux: ${os}\n !!!Aborting!!!" ;;
+	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
 esac
 
 # Allow ${group} users to sudo with password and allow several system commands
