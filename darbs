@@ -430,8 +430,8 @@ esac
 whiptail --infobox "Installing ncspot..." 7 60
 case "${os}" in
 	*Debian*)
-		apt install snapd
-		snap install ncspot
+		apt install -y snapd
+		snap install ncspot --no-confirm
 		;;
 	*Arch*) $aurhelper -S --noconfirm brave-browser ;;
 	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
