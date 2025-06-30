@@ -9,7 +9,7 @@
 			 ### SOURCE CONFIGURATION FILE ###
 ###############################################################################
 
-source ./config
+. ./config
 
 ###############################################################################
 			    ### GLOBAL VARIABLES ###
@@ -348,7 +348,7 @@ case "${os}" in
 esac
 
 # Install the required packages
-for x in "${required_packages[@]}"; do
+for x in $required_packages; do
 	whiptail --title "DARBS Installation" \
 		--infobox "Installing \`$x\` which is required to install and configure other programs." 8 70
 	installpkg "$x"

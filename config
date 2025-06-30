@@ -5,7 +5,7 @@
 ###############################################################################
 dotfile_url="https://github.com/alexb7711/dootfiles.git"
 reporbranch="main"
-required_packages=(curl ca-certificates base-devel git zsh dash stow ntp)
+required_packages="curl ca-certificates base-devel git zsh dash stow ntp"
 
 ###############################################################################
 # Optional
