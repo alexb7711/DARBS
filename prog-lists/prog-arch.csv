@@ -20,6 +20,7 @@
 ,ttf-font-awesome,"provides extended glyph support."
 ,ueberzugpp,"enables previews in the lf file manager."
 ,unclutter,"hides an inactive mouse."
+,unifont, "Unicode characters"
 ,unzip,"unzips zips."
 ,vim,"a tidier vim with some useful features"
 ,wireplumber,"is the audio system."
