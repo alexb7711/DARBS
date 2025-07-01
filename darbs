@@ -468,13 +468,16 @@ mkdir -p /etc/sysctl.d
 echo "kernel.dmesg_restrict = 0" > /etc/sysctl.d/dmesg.conf
 
 # Cleanup
+whiptail --title "DARBS Installation" --infobox "Cleaning up the mess..." 8 70
 rm -f /etc/sudoers.d/darbs-temp
 
-# Clean up
-whiptail --title "DARBS Installation" \
-	--infobox "Cleaning up the mess..." 8 70
 case "$(getos)" in
 	*Debian*)
+		## Enable pipewire
+		sudo -u $name systemctl --user enable pipewire /dev/null 2>&1
+		sudo -u $namesystemctl --user start pipewire /dev/null 2>&1
+
+		## Remove libnewt
 		apt purge -y libnewt-dev > /dev/null 2>&1 || error "Unable to remove \'libnewt-dev\'"
 		;;
 	*Arch*)
