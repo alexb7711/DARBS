@@ -14,7 +14,6 @@
 ###############################################################################
 			    ### GLOBAL VARIABLES ###
 ###############################################################################
-os=""
 create_account=""
 group=""
 name=""
@@ -34,10 +33,10 @@ getos() {
 installpkg() {
 	pkg_mngr="" # Selected package manager based on the flavor of Linux
 	
-	case "${os}" in
+	case "$(getos)" in
 		*Debian*) pkg_mngr="apt install -y" ;;
 		*Arch*) pkg_mngr="pacman --noconfirm --needed -S" ;;
-		*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
+		*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: $(getos)\\n !!! Aborting !!!" ;;
 	esac
 
 	# Install the package
@@ -121,10 +120,10 @@ preinstallmsg() {
 ##============================================================================
 #
 adduserandpass() {
-	case "${os}" in
+	case "$(getos)" in
 		*Debian*) group="sudo";;
 		*Arch*) group="wheel";;
-		*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
+		*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: $(getos)\\n !!! Aborting !!!" ;;
 	esac
 
 	# Adds user `$name` with password $pass1.
@@ -237,16 +236,16 @@ pipinstall() {
 #
 installationloop() {
 	csv_file=""
-	case "${os}" in
+	case "$(getos)" in
 		*Debian*) csv_file="prog-debian.csv";;
 		*Arch*) csv_file="prog-arch.csv";;
-		*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
+		*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: $(getos)\\n !!! Aborting !!!" ;;
 	esac
 
 	progsfile="./prog-lists/${csv_file}"
 	total=$(wc -l <$progsfile)
 
-	case "${os}" in
+	case "$(getos)" in
 		*Arch*) aurinstalled=$(pacman -Qqm);;
 		*);;
 	esac
@@ -291,41 +290,46 @@ finalize() {
 				 ### SCRIPT ###
 ###############################################################################
 
-### This is how everything happens in an intuitive format and order.
-
+##-----------------------------------------------------------------------------
 # Check if user is root on a supported distro. Install whiptail.
 
 [ $(id -u) -ne 0 ] && echo "Please run the script as root... \\n!!! Aborting !!!" && exit 1
 
-os=$(getos)
-case "${os}" in
+case "$(getos)" in
 	*Debian*)
-		apt update -y && apt install -y libnewt-dev ||
+		apt update -y > /dev/null 2>&1 ||
 			error "Are you sure you're running this as the root user, running Debian have an internet connection?"
+		apt install -y libnewt-dev > /dev/null 2>&1 || error "Unable to install \'libnewt-dev\'"
 		;;
 	*Arch*)
 		pacman --noconfirm --needed -Sy libnewt ||
 			error "Are you sure you're running this as the root user, running an Arch-based distribution and have an internet connection?"
 		;;
-	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
+	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: $(getos)\\n !!! Aborting !!!" ;;
 esac
 
+##-----------------------------------------------------------------------------
 # Welcome user and pick dotfiles.
 welcomemsg || error "User exited."
 
+##-----------------------------------------------------------------------------
 # Get and verify username and password.
 getuserandpass || error "User exited."
 
+##-----------------------------------------------------------------------------
 # Give warning if user already exists.
 usercheck || error "User exited."
 
+##-----------------------------------------------------------------------------
 # Last chance for user to back out before install.
 preinstallmsg || error "User exited."
 
+##=============================================================================
 ### The rest of the script requires no user input.
 
+##-----------------------------------------------------------------------------
 # Refresh Arch keyrings.
-case "${os}" in
+case "$(getos)" in
 	*Debian*)
 		apt update ||
 			error "Error automatically refreshing Debian repository. Consider doing so manually."
@@ -334,9 +338,10 @@ case "${os}" in
 		refreshkeys ||
 			error "Error automatically refreshing Arch keyring. Consider doing so manually."
 		;;
-	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
+	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: $(getos)\\n !!! Aborting !!!" ;;
 esac
 
+##-----------------------------------------------------------------------------
 # Install the required packages
 for x in $required_packages; do
 	whiptail --title "DARBS Installation" \
@@ -352,13 +357,14 @@ adduserandpass || error "Error adding username and/or password."
 
 [ -f /etc/sudoers.pacnew ] && cp /etc/sudoers.pacnew /etc/sudoers # Just in case
 
+##-----------------------------------------------------------------------------
 # Allow user to run sudo without password. Since AUR programs must be installed
 # in a fakeroot environment, this is required for all builds with AUR.
 trap 'rm -f /etc/sudoers.d/darbs-temp' HUP INT QUIT TERM PWR EXIT
 echo "%${group} ALL=(ALL) NOPASSWD: ALL
 Defaults:%${group},root runcwd=*" >/etc/sudoers.d/darbs-temp
 
-case "${os}" in
+case "$(getos)" in
 	*Debian*) debian_add_contrib_nonfree ;;
 	*Arch*)
 		# Make pacman colorful, concurrent downloads and Pacman eye-candy.
@@ -376,12 +382,14 @@ case "${os}" in
 	*) ;; # Do nothing
 esac
 
+##-----------------------------------------------------------------------------
 # The command that does all the installing. Reads the progs.csv file and
 # installs each needed program the way required. Be sure to run this only after
 # the user has been created and has priviledges to run sudo without a password
 # and all build dependencies are installed.
 installationloop
 
+##-----------------------------------------------------------------------------
 # Install the dotfiles in the user's home directory, but remove .git dir and
 # other unnecessary files.
 putgitrepo "$dotfilesrepo" "/home/$name/code/dotfiles" "$repobranch"
@@ -396,6 +404,7 @@ cd ${oldpath}
 rmmod pcspkr
 echo "blacklist pcspkr" >/etc/modprobe.d/nobeep.conf
 
+##-----------------------------------------------------------------------------
 # Make zsh the default shell for the user.
 chsh -s /bin/zsh "$name" >/dev/null 2>&1
 sudo -u "$name" mkdir -p "/home/$name/.cache/zsh/"
@@ -403,10 +412,11 @@ sudo -u "$name" mkdir -p "/home/$name/.cache/zsh/"
 # Make dash the default #!/bin/sh symlink.
 ln -sfT /bin/dash /bin/sh >/dev/null 2>&1
 
+##-----------------------------------------------------------------------------
 # All this below to get Brave installed 
-whiptail --infobox "Installing browser..." 7 60
+whiptail --title "DARBS Installation" --infobox "Installing Brave Browser..." 8 70
 
-case "${os}" in
+case "$(getos)" in
 	*Debian*)
 		curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
 		curl -fsSLo /etc/apt/sources.list.d/brave-browser-release.sources https://brave-browser-apt-release.s3.brave.com/brave-browser.sources
@@ -415,19 +425,38 @@ case "${os}" in
 		apt install -y brave-browser > /dev/null 2>&1
 		;;
 	*Arch*) $aurhelper -S --noconfirm brave-browser ;;
-	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
+	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: $(getos)\\n !!! Aborting !!!" ;;
 esac
 
+##-----------------------------------------------------------------------------
+# Install fonts
+whiptail --title "DARBS Installation" --infobox "Downloading fonts..." 8 70
+
+sudo -u "$name" git -C "$repodir" clone --depth 1 --single-branch --no-tags -q "https://github.com/ryanoasis/nerd-fonts.git" "$repodir/nerd-fonts" 
+
+oldpath=$(pwd)
+cd "$repodir/nerd-fonts"
+
+for x in $nerd_fonts; do
+	whiptail --title "DARBS Installation" \
+		--infobox "Installing \'$x Nerd Font\'." 8 70
+	./install.sh "$x" > /dev/null 2>&1
+done
+
+cd "$oldpath"
+
+##-----------------------------------------------------------------------------
 # All this below to get ncspot
-#whiptail --infobox "Installing ncspot..." 7 60
-clear
-case "${os}" in
+whiptail --title "DARBS Installation" \
+	--infobox "Installing ncspot..." 8 70
+
+case "$(getos)" in
 	*Debian*)
 		apt install -y snapd > /dev/null 2>&1
 		snap install ncspot > /dev/null 2>&1
 		;;
 	*Arch*) $aurhelper -S --noconfirm brave-browser ;;
-	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: ${os}\\n !!! Aborting !!!" ;;
+	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: $(getos)\\n !!! Aborting !!!" ;;
 esac
 
 # Allow ${group} users to sudo with password and allow several system commands
@@ -440,6 +469,20 @@ echo "kernel.dmesg_restrict = 0" > /etc/sysctl.d/dmesg.conf
 
 # Cleanup
 rm -f /etc/sudoers.d/darbs-temp
+
+# Clean up
+whiptail --title "DARBS Installation" \
+	--infobox "Cleaning up the mess..." 8 70
+case "$(getos)" in
+	*Debian*)
+		apt purge -y libnewt-dev > /dev/null 2>&1 || error "Unable to remove \'libnewt-dev\'"
+		;;
+	*Arch*)
+		pacman --noconfirm -Rs libnewt ||
+			error "Are you sure you're running this as the root user, running an Arch-based distribution and have an internet connection?"
+		;;
+	*) error "Unable to identify flavor of  Linux!\\n OS IDENTIFIED: $(getos)\\n !!! Aborting !!!" ;;
+esac
 
 # Last message! Install complete!
 finalize

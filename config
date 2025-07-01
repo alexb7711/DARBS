@@ -10,3 +10,4 @@ required_packages="curl ca-certificates build-essential git zsh dash stow ntp"
 ###############################################################################
 # Optional
 ###############################################################################
+nerd_fonts="SpaceMono" # Lists of fonts to install
