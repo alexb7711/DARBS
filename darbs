@@ -331,7 +331,7 @@ preinstallmsg || error "User exited."
 # Refresh Arch keyrings.
 case "$(getos)" in
 	*Debian*)
-		apt update ||
+		apt update -y > /dev/null 2>&1 ||
 			error "Error automatically refreshing Debian repository. Consider doing so manually."
 		;;
 	*Arch*)
@@ -440,7 +440,7 @@ cd "$repodir/nerd-fonts"
 for x in $nerd_fonts; do
 	whiptail --title "DARBS Installation" \
 		--infobox "Installing \'$x Nerd Font\'." 8 70
-	./install.sh "$x" > /dev/null 2>&1
+	sudo -u $name ./install.sh "$x" > /dev/null 2>&1
 done
 
 cd "$oldpath"
