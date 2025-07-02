@@ -453,6 +453,7 @@ whiptail --title "DARBS Installation" \
 case "$(getos)" in
 	*Debian*)
 		apt install -y flatpak > /dev/null 2>&1
+		flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo > /dev/null 2>&1
 		flatpak install flathub io.github.hrkfdn.ncspot > /dev/null 2>&1
 		;;
 	*Arch*) $aurhelper -S --noconfirm brave-browser ;;
