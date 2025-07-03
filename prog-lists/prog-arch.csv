@@ -5,6 +5,7 @@
 ,ffmpeg,"can record and splice video and audio on the command line."
 ,gnome-keyring,"serves as the system keyring."
 ,libnotify,"allows desktop notifications."
+,libsecret, "Library for storing and retrieving passwords and other secrets"
 ,lsd, "Make ls look nice"
 ,lynx,"is a terminal browser also used in LARBS for generating in-terminal previews of websites, emails and HTML files."
 ,maim,"can take quick screenshots at your request."

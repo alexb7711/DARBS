@@ -4,6 +4,7 @@
 ,ffmpeg,"can record and splice video and audio on the command line."
 ,gnome-keyring,"serves as the system keyring."
 ,libnotify-bin,"allows desktop notifications."
+,libsecret-common, "Library for storing and retrieving passwords and other secrets"
 ,libx11-dev,"Provides a client interface to the X Window Subsystem."
 ,libx11-xcb-dev,"Provides clients to mix calls to both Xlib and XCB ovec the same connection."
 ,libxcb-res0-dev,"Provides header and library to build softawre using libxcb-res."
