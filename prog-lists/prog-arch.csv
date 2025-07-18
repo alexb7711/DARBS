@@ -4,6 +4,7 @@
 ,dunst,"is a suckless notification system."
 ,ffmpeg,"can record and splice video and audio on the command line."
 ,gnome-keyring,"serves as the system keyring."
+,imagemagick, "Image manipulation programs"
 ,libnotify,"allows desktop notifications."
 ,libsecret, "Library for storing and retrieving passwords and other secrets"
 ,lsd, "Make ls look nice"
