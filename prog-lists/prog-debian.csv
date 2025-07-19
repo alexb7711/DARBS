@@ -6,6 +6,7 @@
 ,gnome-keyring,"serves as the system keyring."
 ,imagemagick, "Image manipulation programs"
 ,libnotify-bin,"allows desktop notifications."
+,libpam-gnome-keyring, "PAM module to unlock the GNOME keyring upon login."
 ,libsecret-common, "Library for storing and retrieving passwords and other secrets"
 ,libx11-dev,"Provides a client interface to the X Window Subsystem."
 ,libx11-xcb-dev,"Provides clients to mix calls to both Xlib and XCB ovec the same connection."
@@ -18,7 +19,6 @@
 ,newsboat,"is a terminal RSS client."
 ,nextcloud-desktop,"Sync with nextcloud server."
 ,picom, "Lightweight compositor for Linux"
-,plasma-workspace-wallpapers,"Wallpapers for Plasma 5."
 ,poppler-utils,"manipulates .pdfs and gives .pdf previews and other .pdf functions."
 ,pulseaudio-utils,"ommand linu tools for PulseAudio sound server
 ,pulsemixer,"is an audio controller."
